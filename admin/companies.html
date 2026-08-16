@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin - Gestion des Entreprises</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/tables.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar" style="background:#0f172a;">
+      <div class="sidebar-brand">
+        <h2 style="color:#f8fafc;">ServiceFlow</h2>
+        <span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">SUPER ADMIN</span>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="index.html">Vue globale</a>
+        <a href="companies.html" class="active">Entreprises</a>
+        <a href="subscriptions.html">Abonnements</a>
+        <a href="users.html">Utilisateurs Globaux</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Liste des Entreprises Client</h1>
+      </header>
+
+      <section class="section-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Secteur</th>
+                <th>Email Contact</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="companies-table-body">
+              <tr><td colspan="5">Chargement des entreprises...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/appwrite.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/session.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="js/admin-companies.js"></script>
+</body>
+</html>

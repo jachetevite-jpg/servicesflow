@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Techniciens - ServiceFlow</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>ServiceFlow</h2>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html">Tableau de bord</a>
+        <a href="clients.html">Clients</a>
+        <a href="complaints.html">Réclamations</a>
+        <a href="interventions.html">Interventions</a>
+        <a href="technicians.html" class="active">Techniciens</a>
+        <a href="settings.html">Paramètres</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Équipe Techniciens</h1>
+        <button id="btn-open-modal-tech" class="btn btn-primary">+ Nouveau Technicien</button>
+      </header>
+
+      <section class="section-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Statut</th>
+                <th>Inscrit le</th>
+              </tr>
+            </thead>
+            <tbody id="techs-table-body">
+              <tr><td colspan="5">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal-tech" class="modal-backdrop" style="display:none;">
+    <div class="modal-content">
+      <h2>Créer un Profil Technicien</h2>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">
+        Note: Le technicien utilisera cet email pour s'authentifier.
+      </p>
+      <form id="form-tech">
+        <div class="form-group"><label for="t-firstName">Prénom *</label><input type="text" id="t-firstName" required></div>
+        <div class="form-group"><label for="t-lastName">Nom *</label><input type="text" id="t-lastName" required></div>
+        <div class="form-group"><label for="t-email">Email *</label><input type="email" id="t-email" required></div>
+        <div class="form-group"><label for="t-phone">Téléphone</label><input type="tel" id="t-phone"></div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:1rem;">
+          <button type="button" id="btn-close-tech-modal" class="btn btn-secondary">Annuler</button>
+          <button type="submit" class="btn btn-primary">Créer Technicien</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/appwrite.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/technicians.js"></script>
+</body>
+</html>

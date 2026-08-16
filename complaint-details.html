@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détail Réclamation - ServiceFlow</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>ServiceFlow</h2>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html">Tableau de bord</a>
+        <a href="clients.html">Clients</a>
+        <a href="complaints.html" class="active">Réclamations</a>
+        <a href="interventions.html">Interventions</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <h1 id="complaint-ref-title">Réclamation</h1>
+        <a href="complaints.html" class="btn btn-secondary">← Retour</a>
+      </header>
+
+      <section class="section-card" id="complaint-details-box">
+        <p>Chargement des détails...</p>
+      </section>
+
+      <section class="section-card">
+        <h3>Changer le Statut</h3>
+        <div style="display:flex; gap:10px; margin-top:1rem;">
+          <select id="status-select" style="max-width:200px;">
+            <option value="Nouvelle">Nouvelle</option>
+            <option value="En cours">En cours</option>
+            <option value="Intervention programmée">Intervention programmée</option>
+            <option value="Résolue">Résolue</option>
+            <option value="Clôturée">Clôturée</option>
+          </select>
+          <button id="btn-update-status" class="btn btn-primary">Mettre à jour</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/appwrite.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/complaint-details.js"></script>
+</body>
+</html>

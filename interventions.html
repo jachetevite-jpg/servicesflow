@@ -3,428 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interventions - ServicesFlow</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Interventions - ServiceFlow</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
 </head>
 <body>
-  <div id="app-wrapper">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">Interventions Techniques</h1>
-        <p class="page-subtitle">Gestion des ordres de travail, affectations et comptes-rendus.</p>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>ServiceFlow</h2>
+        <span id="company-display-name" style="font-size:0.75rem; color:#94a3b8;">Chargement...</span>
       </div>
-      <div class="header-actions">
-        <button id="btn-open-modal" class="btn btn-primary">+ Planifier une intervention</button>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html">Tableau de bord</a>
+        <a href="clients.html">Clients</a>
+        <a href="complaints.html">Réclamations</a>
+        <a href="interventions.html" class="active">Interventions</a>
+        <a href="technicians.html">Techniciens</a>
+        <a href="notifications.html">Notifications</a>
+        <a href="settings.html">Paramètres</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
       </div>
-    </div>
+    </aside>
 
-    <!-- Barre de filtres -->
-    <div class="card filter-card">
-      <div class="filter-row">
-        <div class="filter-group">
-          <label for="filter-status">Statut</label>
-          <select id="filter-status" class="form-control">
-            <option value="">Tous les statuts</option>
-            <option value="scheduled">Planifiées</option>
-            <option value="in_progress">En cours</option>
-            <option value="completed">Terminées</option>
-            <option value="cancelled">Annulées</option>
-          </select>
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Gestion des Interventions</h1>
+        <button id="btn-open-modal-intervention" class="btn btn-primary">+ Programmer Intervention</button>
+      </header>
+
+      <section class="section-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date & Heure</th>
+                <th>Client</th>
+                <th>Technicien</th>
+                <th>Priorité</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="interventions-table-body">
+              <tr><td colspan="6">Chargement...</td></tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-    </div>
-
-    <!-- Tableau des interventions -->
-    <div class="card">
-      <div class="table-responsive">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Intervention</th>
-              <th>Date prévue</th>
-              <th>Adresse</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="interventions-table-body">
-            <tr>
-              <td colspan="5" class="text-center">Chargement des données...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 
-  <!-- Modal : Créer une intervention -->
-  <div id="modal-intervention" class="modal">
+  <div id="modal-intervention" class="modal-backdrop" style="display:none;">
     <div class="modal-content">
-      <div class="modal-header">
-        <h3>Planifier une intervention</h3>
-        <button class="modal-close" id="modal-close">&times;</button>
-      </div>
-      <form id="form-create-intervention">
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="int-title">Titre / Motif *</label>
-            <input type="text" id="int-title" class="form-control" required placeholder="Ex: Maintenance préventive climatisation">
+      <h2>Programmer une Intervention</h2>
+      <form id="form-intervention" style="margin-top:1rem;">
+        <div class="form-group">
+          <label for="int-clientId">Client *</label>
+          <select id="int-clientId" required><option value="">Sélectionner un client...</option></select>
+        </div>
+        <div class="form-group">
+          <label for="int-complaintId">Réclamation associée (optionnel)</label>
+          <select id="int-complaintId"><option value="">Aucune réclamation</option></select>
+        </div>
+        <div class="form-group">
+          <label for="int-technicianId">Technicien *</label>
+          <select id="int-technicianId" required><option value="">Sélectionner un technicien...</option></select>
+        </div>
+        <div class="form-row" style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;">
+            <label for="int-date">Date prévue *</label>
+            <input type="date" id="int-date" required>
           </div>
-
-          <div class="form-group">
-            <label for="int-client">ID du Client *</label>
-            <input type="text" id="int-client" class="form-control" required placeholder="ID du client">
-          </div>
-
-          <div class="form-group">
-            <label for="int-date">Date et Heure prévues *</label>
-            <input type="datetime-local" id="int-date" class="form-control" required>
-          </div>
-
-          <div class="form-group">
-            <label for="int-address">Adresse du chantier</label>
-            <input type="text" id="int-address" class="form-control" placeholder="12 Rue de la Paix, Paris">
-          </div>
-
-          <div class="form-group">
-            <label for="int-desc">Description / Instructions</label>
-            <textarea id="int-desc" class="form-control" rows="3"></textarea>
+          <div class="form-group" style="flex:1;">
+            <label for="int-time">Heure prévue *</label>
+            <input type="time" id="int-time" required>
           </div>
         </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Annuler</button>
-          <button type="submit" class="btn btn-primary" id="btn-submit-intervention">Enregistrer</button>
+        <div class="form-group">
+          <label for="int-priority">Priorité *</label>
+          <select id="int-priority" required>
+            <option value="Faible">Faible</option>
+            <option value="Normale" selected>Normale</option>
+            <option value="Haute">Haute</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="int-description">Problème / Description *</label>
+          <textarea id="int-description" required></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:1rem;">
+          <button type="button" id="btn-close-intervention-modal" class="btn btn-secondary">Annuler</button>
+          <button type="submit" class="btn btn-primary">Programmer</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Scripts Appwrite & Application -->
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
   <script src="js/appwrite.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/session.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/layout.js"></script>
-  <script src="js/complaints.js"></script>
   <script src="js/interventions.js"></script>
-
-  <!-- Controller logique Interventions -->
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      await SessionManager.requireAuth();
-
-      const tableBody = document.getElementById('interventions-table-body');
-      const filterStatus = document.getElementById('filter-status');
-      const modal = document.getElementById('modal-intervention');
-
-      // Fonction pour recharger la liste des interventions
-      async function loadInterventions() {
-        tableBody.innerHTML = `<tr><td colspan="5" class="text-center">Chargement...</td></tr>`;
-
-        try {
-          const response = await InterventionService.list({
-            statusFilter: filterStatus.value
-          });
-
-          if (response.documents.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="5" class="text-center">Aucune intervention trouvée.</td></tr>`;
-            return;
-          }
-
-          tableBody.innerHTML = response.documents.map(item => `
-            <tr>
-              <td>
-                <strong>${Utils.escapeHtml(item.title)}</strong><br>
-                <small class="text-muted">${Utils.escapeHtml(item.description || '')}</small>
-              </td>
-              <td>${Utils.formatDate(item.scheduledAt)}</td>
-              <td>${Utils.escapeHtml(item.address || 'N/A')}</td>
-              <td><span class="badge status-${item.status}">${Utils.escapeHtml(item.status)}</span></td>
-              <td>
-                <button onclick="completeIntervention('${item.$id}')" class="btn btn-sm btn-outline">Compte-rendu</button>
-              </td>
-            </tr>
-          `).join('');
-
-        } catch (error) {
-          console.error("Erreur lors du chargement des interventions:", error);
-          tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Erreur lors du chargement.</td></tr>`;
-        }
-      }
-
-      // Événements de filtre
-      filterStatus.addEventListener('change', loadInterventions);
-
-      // Gestion du modal
-      document.getElementById('btn-open-modal').addEventListener('click', () => modal.classList.add('active'));
-      document.getElementById('modal-close').addEventListener('click', () => modal.classList.remove('active'));
-      document.getElementById('btn-cancel-modal').addEventListener('click', () => modal.classList.remove('active'));
-
-      // Soumission du formulaire
-      document.getElementById('form-create-intervention').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitBtn = document.getElementById('btn-submit-intervention');
-        submitBtn.disabled = true;
-
-        try {
-          await InterventionService.create({
-            title: document.getElementById('int-title').value,
-            clientId: document.getElementById('int-client').value,
-            scheduledAt: new Date(document.getElementById('int-date').value).toISOString(),
-            address: document.getElementById('int-address').value,
-            description: document.getElementById('int-desc').value
-          });
-
-          modal.classList.remove('active');
-          document.getElementById('form-create-intervention').reset();
-          await loadInterventions();
-        } catch (err) {
-          alert("Erreur lors de la création : " + err.message);
-        } finally {
-          submitBtn.disabled = false;
-        }
-      });
-
-      // Fonction globale pour clôturer une intervention
-      window.completeIntervention = async function(interventionId) {
-        const report = prompt("Entrez le compte-rendu d'intervention :");
-        if (report) {
-          try {
-            await InterventionService.complete(interventionId, report);
-            await loadInterventions();
-          } catch (err) {
-            alert("Erreur lors de la clôture : " + err.message);
-          }
-        }
-      };
-
-      // Premier chargement
-      loadInterventions();
-    });
-  </script>
-document.addEventListener('DOMContentLoaded', () => {
-  const COLLECTION_ID = 'interventions';
-
-  // Éléments du DOM
-  const tableBody = document.getElementById('interventions-table-body') || document.querySelector('tbody');
-  const searchInput = document.getElementById('search-input');
-  const filterStatus = document.getElementById('filter-status');
-  const btnOpenModal = document.getElementById('btn-open-modal');
-
-  // Injection de la modale dans le DOM
-  injectInterventionModal();
-
-  const modal = document.getElementById('intervention-modal');
-  const modalClose = document.getElementById('modal-close');
-  const btnCancel = document.getElementById('btn-cancel-modal');
-  const formIntervention = document.getElementById('form-intervention');
-
-  let searchDebounceTimeout = null;
-
-  // Chargement initial
-  loadInterventions();
-
-  // --- Événements ---
-
-  if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      clearTimeout(searchDebounceTimeout);
-      searchDebounceTimeout = setTimeout(loadInterventions, 300);
-    });
-  }
-
-  if (filterStatus) {
-    filterStatus.addEventListener('change', loadInterventions);
-  }
-
-  if (btnOpenModal) btnOpenModal.addEventListener('click', openModal);
-  if (modalClose) modalClose.addEventListener('click', closeModal);
-  if (btnCancel) btnCancel.addEventListener('click', closeModal);
-
-  if (formIntervention) {
-    formIntervention.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await handleSaveIntervention();
-    });
-  }
-
-  // --- Fonctions ---
-
-  /**
-   * Charge et filtre la liste des interventions depuis Appwrite.
-   */
-  async function loadInterventions() {
-    if (!tableBody) return;
-
-    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Chargement des interventions...</td></tr>';
-
-    try {
-      const queries = [Appwrite.Query.orderDesc('$createdAt')];
-
-      const querySearch = searchInput ? searchInput.value.trim() : '';
-      const queryStatus = filterStatus ? filterStatus.value : '';
-
-      if (querySearch) {
-        queries.push(Appwrite.Query.search('title', querySearch));
-      }
-
-      if (queryStatus) {
-        queries.push(Appwrite.Query.equal('status', queryStatus));
-      }
-
-      const response = await AppwriteConfig.databases.listDocuments(
-        AppwriteConfig.databaseId,
-        COLLECTION_ID,
-        queries
-      );
-
-      renderInterventions(response.documents);
-    } catch (error) {
-      console.error('Erreur de chargement des interventions :', error);
-      tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Erreur : ${Utils.escapeHtml(error.message)}</td></tr>`;
-    }
-  }
-
-  /**
-   * Injecte les lignes du tableau.
-   */
-  function renderInterventions(interventions) {
-    if (!interventions || interventions.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucune intervention trouvée.</td></tr>';
-      return;
-    }
-
-    tableBody.innerHTML = interventions.map(item => {
-      const isUrgent = item.priority === 'urgent';
-      return `
-        <tr class="${isUrgent ? 'row-urgent' : ''}">
-          <td><strong>${Utils.escapeHtml(item.title || 'Sans titre')}</strong></td>
-          <td>${Utils.escapeHtml(item.client_name || 'Client non spécifié')}</td>
-          <td>
-            <span class="badge priority-${Utils.escapeHtml((item.priority || 'medium').toLowerCase())}">
-              ${Utils.escapeHtml(item.priority || 'Normale')}
-            </span>
-          </td>
-          <td>
-            <span class="badge status-${Utils.escapeHtml((item.status || 'pending').toLowerCase())}">
-              ${Utils.escapeHtml(item.status || 'En attente')}
-            </span>
-          </td>
-          <td>${Utils.formatDate(item.scheduled_at || item.$createdAt)}</td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  /**
-   * Sauvegarde une nouvelle intervention.
-   */
-  async function handleSaveIntervention() {
-    const btnSubmit = formIntervention.querySelector('button[type="submit"]');
-    btnSubmit.disabled = true;
-
-    const payload = {
-      title: document.getElementById('intervention-title').value.trim(),
-      client_name: document.getElementById('intervention-client').value.trim(),
-      priority: document.getElementById('intervention-priority').value,
-      status: document.getElementById('intervention-status').value,
-      scheduled_at: document.getElementById('intervention-date').value || new Date().toISOString(),
-      description: document.getElementById('intervention-desc').value.trim()
-    };
-
-    try {
-      await AppwriteConfig.databases.createDocument(
-        AppwriteConfig.databaseId,
-        COLLECTION_ID,
-        Appwrite.ID.unique(),
-        payload
-      );
-
-      closeModal();
-      formIntervention.reset();
-      await loadInterventions();
-    } catch (error) {
-      alert("Erreur lors de la création de l'intervention : " + error.message);
-    } finally {
-      btnSubmit.disabled = false;
-    }
-  }
-
-  function openModal() {
-    if (modal) modal.classList.add('active');
-  }
-
-  function closeModal() {
-    if (modal) modal.classList.remove('active');
-  }
-
-  /**
-   * Structure HTML de la fenêtre modale.
-   */
-  function injectInterventionModal() {
-    if (document.getElementById('intervention-modal')) return;
-
-    const modalHTML = `
-      <div id="intervention-modal" class="modal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>Planifier une Intervention</h3>
-            <button type="button" id="modal-close" class="modal-close">&times;</button>
-          </div>
-          <form id="form-intervention">
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="intervention-title">Titre / Motif *</label>
-                <input type="text" id="intervention-title" class="form-control" required placeholder="Ex: Maintenance serveur">
-              </div>
-
-              <div class="form-group">
-                <label for="intervention-client">Client *</label>
-                <input type="text" id="intervention-client" class="form-control" required placeholder="Nom du client">
-              </div>
-
-              <div class="form-row">
-                <div class="form-group col-6">
-                  <label for="intervention-priority">Priorité</label>
-                  <select id="intervention-priority" class="form-control">
-                    <option value="low">Basse</option>
-                    <option value="medium" selected>Moyenne</option>
-                    <option value="high">Haute</option>
-                    <option value="urgent">Urgente</option>
-                  </select>
-                </div>
-                <div class="form-group col-6">
-                  <label for="intervention-status">Statut</label>
-                  <select id="intervention-status" class="form-control">
-                    <option value="pending">En attente</option>
-                    <option value="in_progress">En cours</option>
-                    <option value="resolved">Terminée</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="intervention-date">Date prévue</label>
-                <input type="datetime-local" id="intervention-date" class="form-control">
-              </div>
-
-              <div class="form-group">
-                <label for="intervention-desc">Description / Instructions</label>
-                <textarea id="intervention-desc" class="form-control" rows="3" placeholder="Détails techniques..."></textarea>
-              </div>
-            </div>
-
-            <div class="modal-footer">
-              <button type="button" id="btn-cancel-modal" class="btn btn-secondary">Annuler</button>
-              <button type="submit" class="btn btn-primary">Créer l'intervention</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-  }
-});
 </body>
 </html>

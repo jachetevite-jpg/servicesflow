@@ -1,0 +1,253 @@
+/* ==========================================================================
+   1. BADGES DE STATUT & ROLES (Admin & App)
+   ========================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 9999px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Statuts Actifs / Validés / Résolus */
+.badge-active,
+.badge-resolved,
+.badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+/* Statuts Inactifs / En attente / Suspensions */
+.badge-pending,
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+/* Statuts Urgents / Erreurs / Suspendus */
+.badge-urgent,
+.badge-danger,
+.badge-suspended {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* Statuts Neutres / Archivés / Informations */
+.badge-info,
+.badge-secondary {
+  background-color: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+/* Badges spécifiques aux rôles utilisateurs */
+.badge-role-super_admin {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+.badge-role-admin {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+.badge-role-agent,
+.badge-role-user {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+
+/* ==========================================================================
+   2. LOGS D'AUDIT & HISTORIQUE D'ACTIVITÉ
+   ========================================================================== */
+
+.logs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.log-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0.85rem 1.1rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.log-item:hover {
+  background-color: #f8fafc;
+}
+
+/* Variantes de logs selon le niveau d'action */
+.log-item.log-info {
+  border-left-color: #3b82f6;
+}
+
+.log-item.log-success {
+  border-left-color: #10b981;
+}
+
+.log-item.log-warning {
+  border-left-color: #f59e0b;
+}
+
+.log-item.log-danger {
+  border-left-color: #ef4444;
+}
+
+.log-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.log-title {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.log-meta {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.log-timestamp {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================================
+   3. NOTIFICATIONS ET SYSTEME D'ALERTES (Toasts & Bannières)
+   ========================================================================== */
+
+/* Conteneur global des toasts (flottant en haut à droite) */
+#toast-container {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 380px;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* Toast individuel */
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.2rem;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  font-size: 0.875rem;
+  color: #1e293b;
+  border-left: 5px solid #3b82f6;
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-success {
+  border-left-color: #10b981;
+}
+
+.toast-error,
+.toast-danger {
+  border-left-color: #ef4444;
+}
+
+.toast-warning {
+  border-left-color: #f59e0b;
+}
+
+.toast-info {
+  border-left-color: #3b82f6;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 0 0 0.75rem;
+  line-height: 1;
+}
+
+.toast-close:hover {
+  color: #1e293b;
+}
+
+/* Bannières d'alerte statiques dans la page */
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.alert-success {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.alert-danger {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.alert-warning {
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.alert-info {
+  background-color: #f0f9ff;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+/* Animation d'apparition des toasts */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

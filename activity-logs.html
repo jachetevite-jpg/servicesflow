@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - ServiceFlow</title>
+  <title>Journal d'activité - ServiceFlow</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/dashboard.css">
   <link rel="stylesheet" href="css/tables.css">
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
 </head>
@@ -14,15 +13,15 @@
     <aside class="sidebar">
       <div class="sidebar-brand">
         <h2>ServiceFlow</h2>
-        <span id="company-display-name" style="font-size:0.75rem; color:#94a3b8;">Chargement...</span>
       </div>
       <nav class="sidebar-menu">
-        <a href="dashboard.html" class="active">Tableau de bord</a>
+        <a href="dashboard.html">Tableau de bord</a>
         <a href="clients.html">Clients</a>
         <a href="complaints.html">Réclamations</a>
         <a href="interventions.html">Interventions</a>
         <a href="technicians.html">Techniciens</a>
         <a href="notifications.html">Notifications</a>
+        <a href="activity-logs.html" class="active">Journal d'activité</a>
         <a href="settings.html">Paramètres</a>
       </nav>
       <div class="sidebar-footer">
@@ -32,44 +31,23 @@
 
     <main class="main-content">
       <header class="topbar">
-        <h1>Tableau de bord</h1>
-        <div id="user-display-name">Chargement...</div>
+        <h1>Journal d'activité & Audit</h1>
       </header>
 
-      <section class="stats-grid">
-        <div class="stat-card">
-          <h3>Total Clients</h3>
-          <p id="stat-clients" class="stat-number">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>Réclamations Ouvertes</h3>
-          <p id="stat-complaints-open" class="stat-number">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>Interventions du Jour</h3>
-          <p id="stat-interventions-today" class="stat-number">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>Techniciens Actifs</h3>
-          <p id="stat-technicians-active" class="stat-number">0</p>
-        </div>
-      </section>
-
       <section class="section-card">
-        <h2>Dernières Réclamations</h2>
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Réf</th>
-                <th>Titre</th>
-                <th>Priorité</th>
-                <th>Statut</th>
-                <th>Date</th>
+                <th>Date & Heure</th>
+                <th>Auteur</th>
+                <th>Action</th>
+                <th>Entité</th>
+                <th>Détails</th>
               </tr>
             </thead>
-            <tbody id="dashboard-recent-complaints">
-              <tr><td colspan="5" class="text-center">Chargement...</td></tr>
+            <tbody id="logs-table-body">
+              <tr><td colspan="5">Chargement du journal...</td></tr>
             </tbody>
           </table>
         </div>
@@ -82,6 +60,6 @@
   <script src="js/session.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/layout.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="js/activity-logs.js"></script>
 </body>
 </html>

@@ -3,22 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contrats - ServicesFlow</title>
+  <title>Notifications - ServiceFlow</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tables.css">
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
 </head>
 <body>
   <div class="app-container">
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <h2>ServicesFlow</h2>
+        <h2>ServiceFlow</h2>
       </div>
       <nav class="sidebar-menu">
-        <a href="index.html">Tableau de bord</a>
+        <a href="dashboard.html">Tableau de bord</a>
         <a href="clients.html">Clients</a>
-        <a href="interventions.html">Interventions</a>
-        <a href="contracts.html" class="active">Contrats</a>
         <a href="complaints.html">Réclamations</a>
+        <a href="interventions.html">Interventions</a>
+        <a href="technicians.html">Techniciens</a>
+        <a href="notifications.html" class="active">Notifications</a>
+        <a href="activity-logs.html">Journal d'activité</a>
+        <a href="settings.html">Paramètres</a>
       </nav>
       <div class="sidebar-footer">
         <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
@@ -27,28 +31,23 @@
 
     <main class="main-content">
       <header class="topbar">
-        <h1>Gestion des Contrats</h1>
-        <div class="user-info">
-          <span id="user-display-name">Chargement...</span>
-        </div>
+        <h1>Notifications Internes</h1>
+        <button id="btn-mark-all-read" class="btn btn-secondary">Tout marquer comme lu</button>
       </header>
 
       <section class="section-card">
-        <p class="text-muted">Module des contrats connecté à la base de données Appwrite.</p>
+        <div id="notifications-list" style="display: flex; flex-direction: column; gap: 1rem;">
+          <p>Chargement des notifications...</p>
+        </div>
       </section>
     </main>
   </div>
 
   <script src="js/appwrite.js"></script>
   <script src="js/utils.js"></script>
+  <script src="js/session.js"></script>
   <script src="js/auth.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const user = await Auth.checkSession();
-      if (user) {
-        document.getElementById('user-display-name').textContent = user.name || user.email;
-      }
-    });
-  </script>
+  <script src="js/layout.js"></script>
+  <script src="js/notifications.js"></script>
 </body>
 </html>

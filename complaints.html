@@ -3,521 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Réclamations & Tickets - ServicesFlow</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Réclamations - ServiceFlow</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
 </head>
 <body>
-  <!-- Conteneur principal injecté par js/layout.js -->
-  <div id="app-wrapper">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">Réclamations & Support</h1>
-        <p class="page-subtitle">Suivez les incidents signalés, assignez les tickets et gérez leur résolution.</p>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>ServiceFlow</h2>
       </div>
-      <div class="header-actions">
-        <button id="btn-open-modal" class="btn btn-primary">+ Créer un ticket</button>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html">Tableau de bord</a>
+        <a href="clients.html">Clients</a>
+        <a href="complaints.html" class="active">Réclamations</a>
+        <a href="interventions.html">Interventions</a>
+        <a href="technicians.html">Techniciens</a>
+        <a href="notifications.html">Notifications</a>
+        <a href="settings.html">Paramètres</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
       </div>
-    </div>
+    </aside>
 
-    <!-- Barre de filtres -->
-    <div class="card filter-card">
-      <div class="filter-row">
-        <div class="filter-group form-flex-grow">
-          <label for="search-input">Recherche</label>
-          <input type="text" id="search-input" class="form-control" placeholder="Rechercher par sujet ou ID client...">
-        </div>
-        <div class="filter-group">
-          <label for="filter-priority">Priorité</label>
-          <select id="filter-priority" class="form-control">
-            <option value="">Toutes les priorités</option>
-            <option value="urgent">🚨 Urgente</option>
-            <option value="high">Haute</option>
-            <option value="medium">Moyenne</option>
-            <option value="low">Basse</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="filter-status">Statut</label>
-          <select id="filter-status" class="form-control">
-            <option value="">Tous les statuts</option>
-            <option value="new">Nouveau</option>
-            <option value="assigned">Assigné</option>
-            <option value="in_progress">En cours</option>
-            <option value="resolved">Résolu</option>
-            <option value="closed">Fermé</option>
-          </select>
-        </div>
-      </div>
-    </div>
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Gestion des Réclamations</h1>
+        <button id="btn-open-modal-complaint" class="btn btn-primary">+ Nouvelle Réclamation</button>
+      </header>
 
-    <!-- Tableau des Réclamations -->
-    <div class="card">
-      <div class="table-responsive">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Ticket / Sujet</th>
-              <th>Client</th>
-              <th>Priorité</th>
-              <th>Statut</th>
-              <th>Date de création</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="complaints-table-body">
-            <tr>
-              <td colspan="6" class="text-center">Chargement des tickets...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <section class="section-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Référence</th>
+                <th>Titre</th>
+                <th>Catégorie</th>
+                <th>Priorité</th>
+                <th>Statut</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="complaints-table-body">
+              <tr><td colspan="7">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <!-- Modal : Créer / Modifier un Ticket -->
-  <div id="modal-complaint" class="modal">
+  <div id="modal-complaint" class="modal-backdrop" style="display:none;">
     <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modal-title">Nouveau Ticket de Réclamation</h3>
-        <button class="modal-close" id="modal-close">&times;</button>
-      </div>
-      <form id="form-complaint">
-        <input type="hidden" id="complaint-id">
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="complaint-title">Sujet du ticket *</label>
-            <input type="text" id="complaint-title" class="form-control" required placeholder="Ex: Panne de climatisation sur le site B">
-          </div>
-
-          <div class="form-group">
-            <label for="complaint-client">ID du Client *</label>
-            <input type="text" id="complaint-client" class="form-control" required placeholder="Identifiant unique du client">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group col-6">
-              <label for="complaint-priority">Priorité *</label>
-              <select id="complaint-priority" class="form-control" required>
-                <option value="low">Basse</option>
-                <option value="medium" selected>Moyenne</option>
-                <option value="high">Haute</option>
-                <option value="urgent">🚨 Urgente</option>
-              </select>
-            </div>
-            <div class="form-group col-6">
-              <label for="complaint-status">Statut</label>
-              <select id="complaint-status" class="form-control">
-                <option value="new">Nouveau</option>
-                <option value="assigned">Assigné</option>
-                <option value="in_progress">En cours</option>
-                <option value="resolved">Résolu</option>
-                <option value="closed">Fermé</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="complaint-assigned">ID du Technicien assigné (Optionnel)</label>
-            <input type="text" id="complaint-assigned" class="form-control" placeholder="ID du profil utilisateur">
-          </div>
-
-          <div class="form-group">
-            <label for="complaint-desc">Description de l'incident *</label>
-            <textarea id="complaint-desc" class="form-control" rows="4" required placeholder="Décrivez en détail le problème rencontré par le client..."></textarea>
-          </div>
+      <h2>Nouvelle Réclamation</h2>
+      <form id="form-complaint" style="margin-top:1rem;">
+        <div class="form-group">
+          <label>Client</label>
+          <select id="cmp-clientId" required><option value="">Sélectionner un client...</option></select>
         </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Annuler</button>
-          <button type="submit" class="btn btn-primary" id="btn-submit-complaint">Enregistrer</button>
+        <div class="form-group"><label>Titre</label><input type="text" id="cmp-title" required></div>
+        <div class="form-group">
+          <label>Catégorie</label>
+          <select id="cmp-category" required>
+            <option value="Technique">Technique</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Facturation">Facturation</option>
+            <option value="Installation">Installation</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priorité</label>
+          <select id="cmp-priority" required>
+            <option value="Faible">Faible</option>
+            <option value="Normale" selected>Normale</option>
+            <option value="Haute">Haute</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Description</label><textarea id="cmp-description" required></textarea></div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:1rem;">
+          <button type="button" id="btn-close-complaint-modal" class="btn btn-secondary">Annuler</button>
+          <button type="submit" class="btn btn-primary">Créer</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Scripts Appwrite & Services -->
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
   <script src="js/appwrite.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/session.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/layout.js"></script>
   <script src="js/complaints.js"></script>
-
-  <!-- Contrôleur dynamique Réclamations -->
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      await SessionManager.requireAuth();
-
-      const tableBody = document.getElementById('complaints-table-body');
-      const searchInput = document.getElementById('search-input');
-      const filterPriority = document.getElementById('filter-priority');
-      const filterStatus = document.getElementById('filter-status');
-      const modal = document.getElementById('modal-complaint');
-      const form = document.getElementById('form-complaint');
-      const modalTitle = document.getElementById('modal-title');
-
-      let searchTimeout = null;
-
-      // Fonction d'affichage des badges de priorité
-      function getPriorityBadge(priority) {
-        const badges = {
-          urgent: '<span class="badge priority-urgent">🚨 Urgente</span>',
-          high: '<span class="badge priority-high">Haute</span>',
-          medium: '<span class="badge priority-medium">Moyenne</span>',
-          low: '<span class="badge priority-low">Basse</span>'
-        };
-        return badges[priority] || `<span class="badge">${priority}</span>`;
-      }
-
-      // Charger la liste des réclamations
-      async function loadComplaints() {
-        tableBody.innerHTML = `<tr><td colspan="6" class="text-center">Chargement...</td></tr>`;
-
-        try {
-          const response = await ComplaintService.list({
-            searchQuery: searchInput.value.trim(),
-            priorityFilter: filterPriority.value,
-            statusFilter: filterStatus.value
-          });
-
-          if (!response.documents || response.documents.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" class="text-center">Aucun ticket trouvé.</td></tr>`;
-            return;
-          }
-
-          tableBody.innerHTML = response.documents.map(item => `
-            <tr class="${item.priority === 'urgent' ? 'row-urgent' : ''}">
-              <td>
-                <strong>${Utils.escapeHtml(item.title)}</strong><br>
-                <small class="text-muted">${Utils.escapeHtml(item.description ? item.description.substring(0, 60) + '...' : '')}</small>
-              </td>
-              <td>${Utils.escapeHtml(item.clientId)}</td>
-              <td>${getPriorityBadge(item.priority)}</td>
-              <td><span class="badge status-${item.status}">${Utils.escapeHtml(item.status)}</span></td>
-              <td>${Utils.formatDate(item.$createdAt)}</td>
-              <td>
-                <button onclick="editComplaint('${item.$id}')" class="btn btn-sm btn-outline">Éditer</button>
-                ${item.status !== 'resolved' && item.status !== 'closed' ? `
-                  <button onclick="resolveComplaint('${item.$id}')" class="btn btn-sm btn-success">Résoudre</button>
-                ` : ''}
-              </td>
-            </tr>
-          `).join('');
-
-        } catch (error) {
-          console.error("Erreur chargement réclamations:", error);
-          tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Erreur lors du chargement des tickets.</td></tr>`;
-        }
-      }
-
-      // Événements
-      searchInput.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(loadComplaints, 300);
-      });
-
-      filterPriority.addEventListener('change', loadComplaints);
-      filterStatus.addEventListener('change', loadComplaints);
-
-      // Modales
-      const openModal = () => {
-        form.reset();
-        document.getElementById('complaint-id').value = '';
-        modalTitle.textContent = "Nouveau Ticket de Réclamation";
-        modal.classList.add('active');
-      };
-
-      const closeModal = () => modal.classList.remove('active');
-
-      document.getElementById('btn-open-modal').addEventListener('click', openModal);
-      document.getElementById('modal-close').addEventListener('click', closeModal);
-      document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
-
-      // Éditer un ticket
-      window.editComplaint = async function(id) {
-        try {
-          const item = await ComplaintService.getById(id);
-          document.getElementById('complaint-id').value = item.$id;
-          document.getElementById('complaint-title').value = item.title;
-          document.getElementById('complaint-client').value = item.clientId;
-          document.getElementById('complaint-priority').value = item.priority || 'medium';
-          document.getElementById('complaint-status').value = item.status || 'new';
-          document.getElementById('complaint-assigned').value = item.assignedTo || '';
-          document.getElementById('complaint-desc').value = item.description || '';
-
-          modalTitle.textContent = "Modifier le Ticket";
-          modal.classList.add('active');
-        } catch (err) {
-          alert("Erreur lors de la récupération du ticket : " + err.message);
-        }
-      };
-
-      // Résoudre rapidement un ticket
-      window.resolveComplaint = async function(id) {
-        if (confirm("Marquer ce ticket comme résolu ?")) {
-          try {
-            await ComplaintService.updateStatus(id, 'resolved');
-            await loadComplaints();
-          } catch (err) {
-            alert("Erreur lors de la mise à jour : " + err.message);
-          }
-        }
-      };
-
-      // Soumission du formulaire
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitBtn = document.getElementById('btn-submit-complaint');
-        submitBtn.disabled = true;
-
-        const id = document.getElementById('complaint-id').value;
-        const complaintData = {
-          title: document.getElementById('complaint-title').value,
-          clientId: document.getElementById('complaint-client').value,
-          priority: document.getElementById('complaint-priority').value,
-          status: document.getElementById('complaint-status').value,
-          assignedTo: document.getElementById('complaint-assigned').value,
-          description: document.getElementById('complaint-desc').value
-        };
-
-        try {
-          if (id) {
-            await ComplaintService.update(id, complaintData);
-          } else {
-            await ComplaintService.create(complaintData);
-          }
-
-          closeModal();
-          await loadComplaints();
-        } catch (err) {
-          alert("Erreur d'enregistrement : " + err.message);
-        } finally {
-          submitBtn.disabled = false;
-        }
-      });
-
-      // Chargement initial
-      loadComplaints();
-    });
-  </script>
-document.addEventListener('DOMContentLoaded', () => {
-  const COLLECTION_ID = 'complaints';
-
-  // Éléments du DOM
-  const tableBody = document.getElementById('complaints-table-body') || document.querySelector('tbody');
-  const searchInput = document.getElementById('search-input');
-  const filterStatus = document.getElementById('filter-status');
-  const btnOpenModal = document.getElementById('btn-open-modal');
-
-  // Injection dynamique de la modale de création
-  injectComplaintModal();
-
-  const modal = document.getElementById('complaint-modal');
-  const modalClose = document.getElementById('modal-close');
-  const btnCancel = document.getElementById('btn-cancel-modal');
-  const formComplaint = document.getElementById('form-complaint');
-
-  let searchDebounceTimeout = null;
-
-  // Chargement initial
-  loadComplaints();
-
-  // --- Événements ---
-
-  if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      clearTimeout(searchDebounceTimeout);
-      searchDebounceTimeout = setTimeout(loadComplaints, 300);
-    });
-  }
-
-  if (filterStatus) {
-    filterStatus.addEventListener('change', loadComplaints);
-  }
-
-  if (btnOpenModal) btnOpenModal.addEventListener('click', openModal);
-  if (modalClose) modalClose.addEventListener('click', closeModal);
-  if (btnCancel) btnCancel.addEventListener('click', closeModal);
-
-  if (formComplaint) {
-    formComplaint.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await handleSaveComplaint();
-    });
-  }
-
-  // --- Fonctions ---
-
-  /**
-   * Charge et filtre la liste des réclamations depuis Appwrite.
-   */
-  async function loadComplaints() {
-    if (!tableBody) return;
-
-    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Chargement des réclamations...</td></tr>';
-
-    try {
-      const queries = [Appwrite.Query.orderDesc('$createdAt')];
-
-      const querySearch = searchInput ? searchInput.value.trim() : '';
-      const queryStatus = filterStatus ? filterStatus.value : '';
-
-      if (querySearch) {
-        queries.push(Appwrite.Query.search('subject', querySearch));
-      }
-
-      if (queryStatus) {
-        queries.push(Appwrite.Query.equal('status', queryStatus));
-      }
-
-      const response = await AppwriteConfig.databases.listDocuments(
-        AppwriteConfig.databaseId,
-        COLLECTION_ID,
-        queries
-      );
-
-      renderComplaints(response.documents);
-    } catch (error) {
-      console.error('Erreur lors du chargement des réclamations :', error);
-      tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Erreur : ${Utils.escapeHtml(error.message)}</td></tr>`;
-    }
-  }
-
-  /**
-   * Rendu HTML des réclamations dans le tableau.
-   */
-  function renderComplaints(complaints) {
-    if (!complaints || complaints.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucune réclamation trouvée.</td></tr>';
-      return;
-    }
-
-    tableBody.innerHTML = complaints.map(item => {
-      const isUrgent = item.priority === 'urgent';
-
-      return `
-        <tr class="${isUrgent ? 'row-urgent' : ''}">
-          <td><strong>${Utils.escapeHtml(item.subject || 'Sujet non spécifié')}</strong></td>
-          <td>${Utils.escapeHtml(item.client_name || 'Client anonyme')}</td>
-          <td>
-            <span class="badge priority-${Utils.escapeHtml((item.priority || 'medium').toLowerCase())}">
-              ${Utils.escapeHtml(item.priority || 'Moyenne')}
-            </span>
-          </td>
-          <td>
-            <span class="badge status-${Utils.escapeHtml((item.status || 'new').toLowerCase())}">
-              ${Utils.escapeHtml(item.status || 'Nouveau')}
-            </span>
-          </td>
-          <td>${Utils.formatDate(item.$createdAt)}</td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  /**
-   * Sauvegarde une nouvelle réclamation dans Appwrite.
-   */
-  async function handleSaveComplaint() {
-    const btnSubmit = formComplaint.querySelector('button[type="submit"]');
-    btnSubmit.disabled = true;
-
-    const payload = {
-      subject: document.getElementById('complaint-subject').value.trim(),
-      client_name: document.getElementById('complaint-client').value.trim(),
-      priority: document.getElementById('complaint-priority').value,
-      status: document.getElementById('complaint-status').value,
-      description: document.getElementById('complaint-desc').value.trim()
-    };
-
-    try {
-      await AppwriteConfig.databases.createDocument(
-        AppwriteConfig.databaseId,
-        COLLECTION_ID,
-        Appwrite.ID.unique(),
-        payload
-      );
-
-      closeModal();
-      formComplaint.reset();
-      await loadComplaints();
-    } catch (error) {
-      alert("Erreur lors de la création du ticket : " + error.message);
-    } finally {
-      btnSubmit.disabled = false;
-    }
-  }
-
-  function openModal() {
-    if (modal) modal.classList.add('active');
-  }
-
-  function closeModal() {
-    if (modal) modal.classList.remove('active');
-  }
-
-  /**
-   * Génère la modale de création de réclamation dans le DOM.
-   */
-  function injectComplaintModal() {
-    if (document.getElementById('complaint-modal')) return;
-
-    const modalHTML = `
-      <div id="complaint-modal" class="modal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>Nouveau Ticket de Réclamation</h3>
-            <button type="button" id="modal-close" class="modal-close">&times;</button>
-          </div>
-          <form id="form-complaint">
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="complaint-subject">Sujet / Problème *</label>
-                <input type="text" id="complaint-subject" class="form-control" required placeholder="Ex: Interruption de service">
-              </div>
-
-              <div class="form-group">
-                <label for="complaint-client">Client concerné *</label>
-                <input type="text" id="complaint-client" class="form-control" required placeholder="Nom du client">
-              </div>
-
-              <div class="form-row">
-                <div class="form-group col-6">
-                  <label for="complaint-priority">Priorité</label>
-                  <select id="complaint-priority" class="form-control">
-                    <option value="low">Basse</option>
-                    <option value="medium" selected>Moyenne</option>
-                    <option value="high">Haute</option>
-                    <option value="urgent">Urgente</option>
-                  </select>
-                </div>
-                <div class="form-group col-6">
-                  <label for="complaint-status">Statut</label>
-                  <select id="complaint-status" class="form-control">
-                    <option value="new" selected>Nouveau</option>
-                    <option value="in_progress">En cours</option>
-                    <option value="resolved">Résolu</option>
-                    <option value="closed">Fermé</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="complaint-desc">Description détaillée</label>
-                <textarea id="complaint-desc" class="form-control" rows="4" placeholder="Explication du problème ou de la réclamation..."></textarea>
-              </div>
-            </div>
-
-            <div class="modal-footer">
-              <button type="button" id="btn-cancel-modal" class="btn btn-secondary">Annuler</button>
-              <button type="submit" class="btn btn-primary">Créer le ticket</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-  }
-});
 </body>
 </html>

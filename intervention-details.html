@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contrats - ServicesFlow</title>
+  <title>Détail Intervention - ServiceFlow</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/forms.css">
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
 </head>
 <body>
   <div class="app-container">
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <h2>ServicesFlow</h2>
+        <h2>ServiceFlow</h2>
       </div>
       <nav class="sidebar-menu">
-        <a href="index.html">Tableau de bord</a>
+        <a href="dashboard.html">Tableau de bord</a>
         <a href="clients.html">Clients</a>
-        <a href="interventions.html">Interventions</a>
-        <a href="contracts.html" class="active">Contrats</a>
         <a href="complaints.html">Réclamations</a>
+        <a href="interventions.html" class="active">Interventions</a>
       </nav>
       <div class="sidebar-footer">
         <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
@@ -27,28 +27,28 @@
 
     <main class="main-content">
       <header class="topbar">
-        <h1>Gestion des Contrats</h1>
-        <div class="user-info">
-          <span id="user-display-name">Chargement...</span>
-        </div>
+        <h1>Fiche Intervention</h1>
+        <a href="interventions.html" class="btn btn-secondary">← Retour</a>
       </header>
 
+      <section class="section-card" id="intervention-header">
+        <p>Chargement des détails...</p>
+      </section>
+
       <section class="section-card">
-        <p class="text-muted">Module des contrats connecté à la base de données Appwrite.</p>
+        <h2>Rapport de Technicien</h2>
+        <div id="intervention-report-content" style="margin-top:1rem;">
+          <p>Chargement du compte-rendu...</p>
+        </div>
       </section>
     </main>
   </div>
 
   <script src="js/appwrite.js"></script>
   <script src="js/utils.js"></script>
+  <script src="js/session.js"></script>
   <script src="js/auth.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const user = await Auth.checkSession();
-      if (user) {
-        document.getElementById('user-display-name').textContent = user.name || user.email;
-      }
-    });
-  </script>
+  <script src="js/layout.js"></script>
+  <script src="js/intervention-details.js"></script>
 </body>
 </html>

@@ -1,5 +1,11 @@
 [build]
   publish = "."
+  command = ""
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/:splat"
+  status = 200
 
 [[redirects]]
   from = "/*"

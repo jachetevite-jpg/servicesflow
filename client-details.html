@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détail Client - ServiceFlow</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>ServiceFlow</h2>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html">Tableau de bord</a>
+        <a href="clients.html" class="active">Clients</a>
+        <a href="complaints.html">Réclamations</a>
+        <a href="interventions.html">Interventions</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Fiche Client</h1>
+        <a href="clients.html" class="btn btn-secondary">← Retour</a>
+      </header>
+
+      <section class="section-card" id="client-info">
+        <p>Chargement des informations...</p>
+      </section>
+
+      <section class="section-card">
+        <h2>Réclamations associées</h2>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr><th>Réf</th><th>Titre</th><th>Priorité</th><th>Statut</th></tr>
+            </thead>
+            <tbody id="client-complaints-tbody">
+              <tr><td colspan="4">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/appwrite.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/client-details.js"></script>
+</body>
+</html>

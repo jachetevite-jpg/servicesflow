@@ -3,56 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inscription - ServicesFlow</title>
+  <title>Inscription Entreprise - ServiceFlow SaaS</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
 </head>
-<body>
-  <div class="auth-container">
-    <h2>Créer un compte</h2>
-    <p class="text-muted" style="margin-bottom: 1.5rem;">Rejoignez ServicesFlow</p>
-    
-    <form id="register-form" onsubmit="handleRegister(event)">
+<body class="auth-body">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>ServiceFlow</h2>
+      <p>Créer votre espace entreprise</p>
+    </div>
+
+    <form id="register-form">
       <div class="form-group">
-        <label for="name">Nom complet</label>
-        <input type="text" id="name" class="form-control" required placeholder="Jean Dupont">
+        <label for="companyName">Nom de l'entreprise *</label>
+        <input type="text" id="companyName" required placeholder="Ex: Tech Solutions SARL">
       </div>
+
+      <div class="form-row" style="display: flex; gap: 10px;">
+        <div class="form-group" style="flex: 1;">
+          <label for="firstName">Prénom *</label>
+          <input type="text" id="firstName" required placeholder="Jean">
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label for="lastName">Nom *</label>
+          <input type="text" id="lastName" required placeholder="Dupont">
+        </div>
+      </div>
+
       <div class="form-group">
-        <label for="email">Adresse email</label>
-        <input type="email" id="email" class="form-control" required placeholder="nom@exemple.com">
+        <label for="email">Adresse Email professionnelle *</label>
+        <input type="email" id="email" required placeholder="admin@entreprise.com">
       </div>
+
       <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <input type="password" id="password" class="form-control" required placeholder="•••••••• (min. 8 caractères)">
+        <label for="phone">Téléphone</label>
+        <input type="tel" id="phone" placeholder="+33 6 12 34 56 78">
       </div>
-      <button type="submit" id="btn-submit" class="btn btn-primary btn-block">S'inscrire</button>
+
+      <div class="form-group">
+        <label for="password">Mot de passe *</label>
+        <input type="password" id="password" minlength="8" required placeholder="8 caractères minimum">
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmer le mot de passe *</label>
+        <input type="password" id="confirmPassword" minlength="8" required placeholder="Répéter le mot de passe">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Créer mon espace</button>
     </form>
 
-    <p style="margin-top: 1rem; text-align: center;" class="text-muted">
-      Déjà inscrit ? <a href="login.html">Se connecter</a>
-    </p>
+    <div class="auth-footer">
+      <p>Vous avez déjà un compte ? <a href="login.html">Se connecter</a></p>
+    </div>
   </div>
 
   <script src="js/appwrite.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/session.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    async function handleRegister(e) {
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('btn-submit');
-      btn.disabled = true;
-      btn.textContent = "Inscription...";
+      const pwd = document.getElementById('password').value;
+      const confirmPwd = document.getElementById('confirmPassword').value;
 
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      try {
-        await Auth.register(email, password, name);
-      } catch (err) {
-        btn.disabled = false;
-        btn.textContent = "S'inscrire";
+      if (pwd !== confirmPwd) {
+        Utils.showAlert("Les mots de passe ne correspondent pas.", "error");
+        return;
       }
-    }
+
+      await Auth.registerCompany({
+        companyName: document.getElementById('companyName').value,
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        password: pwd
+      });
+    });
   </script>
 </body>
 </html>
