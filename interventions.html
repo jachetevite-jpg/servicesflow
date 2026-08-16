@@ -60,7 +60,7 @@
   <script src="js/session.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/interventions.js"></script>
-<!-- Modal Ajout Intervention -->
+<!-- Modal Ajout Intervention avec Sélecteur Client -->
 <div id="modal-intervention" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header">
@@ -68,18 +68,30 @@
       <button class="modal-close" onclick="closeModal('modal-intervention')">&times;</button>
     </div>
     <form id="form-add-intervention">
+      
+      <!-- Sélecteur dynamique des clients -->
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label for="intervention-client">Client *</label>
+        <select id="intervention-client" class="form-control" required>
+          <option value="">Chargement des clients...</option>
+        </select>
+      </div>
+
       <div class="form-group" style="margin-bottom: 1rem;">
         <label for="intervention-title">Titre / Intitulé *</label>
-        <input type="text" id="intervention-title" class="form-control" required placeholder="ex: Maintenance serveur">
+        <input type="text" id="intervention-title" class="form-control" required placeholder="ex: Maintenance réseau / Dépannage">
       </div>
+
       <div class="form-group" style="margin-bottom: 1rem;">
         <label for="intervention-description">Description</label>
-        <textarea id="intervention-description" class="form-control" rows="3" placeholder="Détails du problème ou de l'intervention"></textarea>
+        <textarea id="intervention-description" class="form-control" rows="3" placeholder="Détails du problème ou instructions"></textarea>
       </div>
+
       <div class="form-group" style="margin-bottom: 1rem;">
         <label for="intervention-technician">Technicien / Agent Assigné</label>
         <input type="text" id="intervention-technician" class="form-control" placeholder="Nom du technicien">
       </div>
+
       <div class="form-group" style="margin-bottom: 1rem;">
         <label for="intervention-status">Statut *</label>
         <select id="intervention-status" class="form-control" required>
@@ -89,17 +101,17 @@
           <option value="cancelled">Annulée</option>
         </select>
       </div>
+
       <div class="form-group" style="margin-bottom: 1rem;">
         <label for="intervention-date">Date Prévue</label>
         <input type="datetime-local" id="intervention-date" class="form-control">
       </div>
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="closeModal('modal-intervention')">Annuler</button>
         <button type="submit" id="btn-save-intervention" class="btn btn-primary">Créer</button>
-	<button id="btn-open-intervention-modal" class="btn btn-primary">+ Nouvelle Intervention</button>
       </div>
     </form>
   </div>
-</div>
-</body>
+</div></body>
 </html>
