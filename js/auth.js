@@ -18,6 +18,15 @@ const Auth = {
     async login(email, password) {
         try {
             const account = AppwriteConfig.account;
+
+            // 1. Déconnexion préventive si une session est déjà active
+            try {
+                await account.deleteSession('current');
+            } catch (e) {
+                // Pas de session active, on peut continuer
+            }
+
+            // 2. Création de la nouvelle session
             if (typeof account.createEmailPasswordSession === 'function') {
                 await account.createEmailPasswordSession(email, password);
             } else if (typeof account.createEmailSession === 'function') {
@@ -25,6 +34,7 @@ const Auth = {
             } else {
                 await account.createSession(email, password);
             }
+
             window.location.href = 'index.html';
         } catch (error) {
             console.error('Erreur de connexion :', error);
@@ -34,7 +44,19 @@ const Auth = {
 
     async register(email, password, name) {
         try {
-            await AppwriteConfig.account.create('unique()', email, password, name);
+            const account = AppwriteConfig.account;
+
+            // 1. Déconnexion préventive si une session est déjà active
+            try {
+                await account.deleteSession('current');
+            } catch (e) {
+                // Pas de session active, on peut continuer
+            }
+
+            // 2. Création du compte
+            await account.create('unique()', email, password, name);
+
+            // 3. Connexion automatique
             await this.login(email, password);
         } catch (error) {
             console.error('Erreur lors de l\'inscription :', error);
@@ -48,6 +70,7 @@ const Auth = {
             window.location.href = 'login.html';
         } catch (error) {
             console.error('Erreur de déconnexion :', error);
+            window.location.href = 'login.html';
         }
     }
 };
