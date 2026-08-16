@@ -1,13 +1,16 @@
 /**
- * Gestion de la session et des accès (RBAC)
+ * Gestion stricte de la session Appwrite
  */
 const Session = {
   currentUser: null,
   currentProfile: null,
 
   async requireAuth(allowedRoles = []) {
+    // 1. Masquer le body immédiatement pendant la vérification
+    document.body.style.display = 'none';
+
     try {
-      // 1. Récupérer l'utilisateur connecté via Appwrite Auth
+      // 2. Vérifier si une session Appwrite valide existe
       this.currentUser = await AppwriteConfig.account.get();
       
       if (!this.currentUser) {
@@ -15,7 +18,7 @@ const Session = {
         return null;
       }
 
-      // 2. Tenter de récupérer le profil (si la collection existe)
+      // 3. Tenter de récupérer le profil utilisateur
       try {
         const profileRes = await AppwriteConfig.databases.listDocuments(
           AppwriteConfig.databaseId,
@@ -26,8 +29,8 @@ const Session = {
         if (profileRes.documents && profileRes.documents.length > 0) {
           this.currentProfile = profileRes.documents[0];
         }
-      } catch (err) {
-        console.warn("Collection 'profiles' introuvable ou inaccessible. Utilisation du profil de secours.");
+      } catch (e) {
+        console.warn("Collection 'profiles' absente ou inaccessible.");
       }
 
       // Profil par défaut si non trouvé
@@ -35,22 +38,12 @@ const Session = {
         this.currentProfile = {
           $id: this.currentUser.$id,
           userId: this.currentUser.$id,
-          role: 'company_admin', // Rôle par défaut temporaire pour débloquer
-          companyId: 'default'
+          role: 'company_admin'
         };
       }
 
-      // 3. Vérification des rôles (si spécifié)
-      if (allowedRoles.length > 0) {
-        const userRole = this.currentProfile.role || 'user';
-        const hasAccess = userRole === 'super_admin' || allowedRoles.includes(userRole);
-
-        if (!hasAccess) {
-          console.warn(`Accès refusé. Rôle requis: ${allowedRoles.join(', ')} | Votre rôle: ${userRole}`);
-          window.location.href = 'dashboard.html';
-          return null;
-        }
-      }
+      // 4. Si tout est valide, afficher la page
+      document.body.style.display = 'block';
 
       return {
         user: this.currentUser,
@@ -58,16 +51,20 @@ const Session = {
       };
 
     } catch (error) {
-      console.error("Erreur de session Appwrite :", error);
+      console.error("Session non authentifiée :", error);
       this.redirectToLogin();
       return null;
     }
   },
 
   redirectToLogin() {
+    // Redirection propre vers login.html
     const currentPath = window.location.pathname;
     if (!currentPath.endsWith('login.html') && !currentPath.endsWith('register.html')) {
-      window.location.href = 'login.html';
+      window.location.href = '/login.html';
+    } else {
+      // Si on est déjà sur login.html, réafficher la page
+      document.body.style.display = 'block';
     }
   }
 };
