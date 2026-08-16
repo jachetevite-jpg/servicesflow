@@ -11,41 +11,52 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadDashboardData() {
     try {
-      // 1. Nombre total de clients
-      const clientsRes = await AppwriteConfig.databases.listDocuments(
-        AppwriteConfig.databaseId,
-        AppwriteConfig.collections.clients,
-        [Appwrite.Query.limit(1)]
-      );
-      document.getElementById('stat-clients').textContent = clientsRes.total || 0;
+      // 1. Clients
+      try {
+        const clientsRes = await AppwriteConfig.databases.listDocuments(
+          AppwriteConfig.databaseId,
+          AppwriteConfig.collections.clients,
+          [Appwrite.Query.limit(1)]
+        );
+        document.getElementById('stat-clients').textContent = clientsRes.total || 0;
+      } catch (e) { console.warn('Collection clients non accessible'); }
 
       // 2. Interventions
-      const interventionsRes = await AppwriteConfig.databases.listDocuments(
-        AppwriteConfig.databaseId,
-        AppwriteConfig.collections.interventions,
-        [Appwrite.Query.orderDesc('$createdAt'), Appwrite.Query.limit(5)]
-      );
-      document.getElementById('stat-interventions').textContent = interventionsRes.total || 0;
-      renderRecentInterventions(interventionsRes.documents);
+      try {
+        const interventionsRes = await AppwriteConfig.databases.listDocuments(
+          AppwriteConfig.databaseId,
+          AppwriteConfig.collections.interventions,
+          [Appwrite.Query.orderDesc('$createdAt'), Appwrite.Query.limit(5)]
+        );
+        document.getElementById('stat-interventions').textContent = interventionsRes.total || 0;
+        renderRecentInterventions(interventionsRes.documents);
+      } catch (e) {
+        console.warn('Collection interventions non accessible');
+        document.getElementById('recent-interventions-body').innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucune donnée disponible.</td></tr>';
+      }
 
       // 3. Contrats
-      const contractsRes = await AppwriteConfig.databases.listDocuments(
-        AppwriteConfig.databaseId,
-        AppwriteConfig.collections.contracts,
-        [Appwrite.Query.limit(1)]
-      );
-      document.getElementById('stat-contracts').textContent = contractsRes.total || 0;
+      try {
+        const contractsRes = await AppwriteConfig.databases.listDocuments(
+          AppwriteConfig.databaseId,
+          AppwriteConfig.collections.contracts,
+          [Appwrite.Query.limit(1)]
+        );
+        document.getElementById('stat-contracts').textContent = contractsRes.total || 0;
+      } catch (e) { console.warn('Collection contracts non accessible'); }
 
       // 4. Réclamations
-      const complaintsRes = await AppwriteConfig.databases.listDocuments(
-        AppwriteConfig.databaseId,
-        AppwriteConfig.collections.complaints,
-        [Appwrite.Query.limit(1)]
-      );
-      document.getElementById('stat-complaints').textContent = complaintsRes.total || 0;
+      try {
+        const complaintsRes = await AppwriteConfig.databases.listDocuments(
+          AppwriteConfig.databaseId,
+          AppwriteConfig.collections.complaints,
+          [Appwrite.Query.limit(1)]
+        );
+        document.getElementById('stat-complaints').textContent = complaintsRes.total || 0;
+      } catch (e) { console.warn('Collection complaints non accessible'); }
 
     } catch (error) {
-      console.error('Erreur lors du chargement du tableau de bord :', error);
+      console.error('Erreur lors du chargement des statistiques :', error);
     }
   }
 

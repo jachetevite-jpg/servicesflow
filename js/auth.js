@@ -1,13 +1,13 @@
-/**
- * Service d'Authentification ServicesFlow
- */
 const Auth = {
     async checkSession() {
         try {
             const user = await AppwriteConfig.account.get();
             return user;
         } catch (error) {
-            const currentPage = window.location.pathname.split('/').pop();
+            const path = window.location.pathname;
+            const currentPage = path.substring(path.lastIndexOf('/') + 1);
+            
+            // Éviter les redirections infinies
             if (currentPage !== 'login.html' && currentPage !== 'register.html') {
                 window.location.href = 'login.html';
             }
@@ -19,14 +19,11 @@ const Auth = {
         try {
             const account = AppwriteConfig.account;
 
-            // 1. Déconnexion préventive si une session est déjà active
+            // Déconnexion préventive si une session résiduelle existe
             try {
                 await account.deleteSession('current');
-            } catch (e) {
-                // Pas de session active, on peut continuer
-            }
+            } catch (e) {}
 
-            // 2. Création de la nouvelle session
             if (typeof account.createEmailPasswordSession === 'function') {
                 await account.createEmailPasswordSession(email, password);
             } else if (typeof account.createEmailSession === 'function') {
@@ -46,33 +43,37 @@ const Auth = {
         try {
             const account = AppwriteConfig.account;
 
-            // 1. Déconnexion préventive si une session est déjà active
             try {
                 await account.deleteSession('current');
-            } catch (e) {
-                // Pas de session active, on peut continuer
-            }
+            } catch (e) {}
 
-            // 2. Création du compte
             await account.create('unique()', email, password, name);
-
-            // 3. Connexion automatique
             await this.login(email, password);
         } catch (error) {
             console.error('Erreur lors de l\'inscription :', error);
-            alert('Erreur d\'inscription : ' + (error.message || 'Vérifiez les informations'));
+            alert('Erreur d\'inscription : ' + (error.message || 'Vérifiez vos informations'));
         }
     },
 
     async logout() {
         try {
             await AppwriteConfig.account.deleteSession('current');
-            window.location.href = 'login.html';
         } catch (error) {
             console.error('Erreur de déconnexion :', error);
+        } finally {
             window.location.href = 'login.html';
         }
     }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = document.getElementById('btn-logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            Auth.logout();
+        });
+    }
+});
 
 window.Auth = Auth;

@@ -118,7 +118,10 @@ body {
   margin-bottom: 2rem;
 }
 
-/* Table */
+.table-responsive {
+  overflow-x: auto;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -137,7 +140,6 @@ body {
   font-weight: 600;
 }
 
-/* Buttons & Badges */
 .btn {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -170,7 +172,6 @@ body {
 .text-center { text-align: center; }
 .text-muted { color: var(--text-muted); }
 
-/* Forms & Auth */
 .auth-container {
   max-width: 400px;
   margin: 5rem auto;

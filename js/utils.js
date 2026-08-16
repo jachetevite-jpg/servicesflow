@@ -1,6 +1,3 @@
-/**
- * Utilitaires partagés pour l'application
- */
 const Utils = {
     escapeHtml(str) {
         if (!str) return '';

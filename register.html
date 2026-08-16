@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inscription - ServicesFlow</title>
   <link rel="stylesheet" href="css/style.css">
-  <!-- SDK Appwrite v14 -->
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
 </head>
 <body>
@@ -41,7 +40,7 @@
       e.preventDefault();
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
-      btn.textContent = "Inscription en cours...";
+      btn.textContent = "Inscription...";
 
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
