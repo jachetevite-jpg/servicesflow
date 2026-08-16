@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServicesFlow - Tableau de bord</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Appwrite Web SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Barre de navigation latérale -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>ServicesFlow</h2>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="index.html" class="active">Tableau de bord</a>
+        <a href="clients.html">Clients</a>
+        <a href="interventions.html">Interventions</a>
+        <a href="contracts.html">Contrats</a>
+        <a href="complaints.html">Réclamations</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-logout" class="btn btn-danger btn-block">Déconnexion</button>
+      </div>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Tableau de bord</h1>
+        <div class="user-info">
+          <span id="user-display-name">Chargement...</span>
+        </div>
+      </header>
+
+      <!-- Cartes de statistiques -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <h3>Clients</h3>
+          <p id="stat-clients" class="stat-number">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Interventions en cours</h3>
+          <p id="stat-interventions" class="stat-number">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Contrats actifs</h3>
+          <p id="stat-contracts" class="stat-number">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Réclamations ouvertes</h3>
+          <p id="stat-complaints" class="stat-number">0</p>
+        </div>
+      </section>
+
+      <!-- Section d'activité récente -->
+      <section class="recent-activity section-card">
+        <h2>Dernières interventions</h2>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Client</th>
+                <th>Priorité</th>
+                <th>Statut</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="recent-interventions-body">
+              <tr>
+                <td colspan="5" class="text-center text-muted">Chargement des données...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Scripts JavaScript -->
+  <script src="js/appwrite.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>

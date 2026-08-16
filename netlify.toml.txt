@@ -1,0 +1,11 @@
+# Configuration des redirections ServicesFlow
+[[redirects]]
+  from = "/"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/:splat.html"
+  status = 200
+  force = false

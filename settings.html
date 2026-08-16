@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paramètres de l'entreprise - ServiceFlow</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app-wrapper">
+    <div class="page-header">
+      <h1>Paramètres de l'Entreprise</h1>
+      <p class="text-muted">Gérez les coordonnées et informations légales de votre société.</p>
+    </div>
+
+    <div id="company-alert" class="alert hidden"></div>
+
+    <div class="card">
+      <form id="company-settings-form">
+        <div class="form-group">
+          <label for="company-name">Nom de l'entreprise</label>
+          <input type="text" id="company-name" class="form-control" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="company-email">Email de contact</label>
+            <input type="email" id="company-email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="company-phone">Téléphone</label>
+            <input type="tel" id="company-phone" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="company-address">Adresse du siège social</label>
+          <textarea id="company-address" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="company-siret">Numéro SIRET / Identifiant légal</label>
+          <input type="text" id="company-siret" class="form-control">
+        </div>
+
+        <button type="submit" id="btn-save-company" class="btn btn-primary">
+          Enregistrer les modifications
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+  <script src="js/appwrite.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/company.js"></script>
+</body>
+</html>

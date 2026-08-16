@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Contrats - ServicesFlow</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Conteneur principal injecté par js/layout.js -->
+  <div id="app-wrapper">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Contrats & Engagements (SLA)</h1>
+        <p class="page-subtitle">Suivez les contrats clients, périodes de validité et montants associés.</p>
+      </div>
+      <div class="header-actions">
+        <button id="btn-open-modal" class="btn btn-primary">+ Nouveau contrat</button>
+      </div>
+    </div>
+
+    <!-- Filtres & Recherche -->
+    <div class="card filter-card">
+      <div class="filter-row">
+        <div class="filter-group form-flex-grow">
+          <label for="search-input">Recherche</label>
+          <input type="text" id="search-input" class="form-control" placeholder="Rechercher par titre de contrat ou ID client...">
+        </div>
+        <div class="filter-group">
+          <label for="filter-status">Statut du contrat</label>
+          <select id="filter-status" class="form-control">
+            <option value="">Tous les statuts</option>
+            <option value="active">Actif</option>
+            <option value="pending">En attente</option>
+            <option value="expired">Expiré</option>
+            <option value="terminated">Résilié</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau des Contrats -->
+    <div class="card">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Contrat</th>
+              <th>Période de validité</th>
+              <th>Valeur</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="contracts-table-body">
+            <tr>
+              <td colspan="5" class="text-center">Chargement des contrats...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal : Créer / Modifier un Contrat -->
+  <div id="modal-contract" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Nouveau Contrat</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <form id="form-contract">
+        <input type="hidden" id="contract-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="contract-title">Titre / Référence du contrat *</label>
+            <input type="text" id="contract-title" class="form-control" required placeholder="Ex: Contrat de maintenance annuelle HVAC">
+          </div>
+
+          <div class="form-group">
+            <label for="contract-client">ID du Client *</label>
+            <input type="text" id="contract-client" class="form-control" required placeholder="Identifiant unique du client">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="contract-start">Date de début *</label>
+              <input type="date" id="contract-start" class="form-control" required>
+            </div>
+            <div class="form-group col-6">
+              <label for="contract-end">Date d'échéance *</label>
+              <input type="date" id="contract-end" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="contract-amount">Montant (EUR / FCFA) *</label>
+              <input type="number" step="0.01" id="contract-amount" class="form-control" required placeholder="0.00">
+            </div>
+            <div class="form-group col-6">
+              <label for="contract-status">Statut</label>
+              <select id="contract-status" class="form-control">
+                <option value="active">Actif</option>
+                <option value="pending">En attente de signature</option>
+                <option value="expired">Expiré</option>
+                <option value="terminated">Résilié</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contract-desc">Description / Conditions SLA</label>
+            <textarea id="contract-desc" class="form-control" rows="3" placeholder="Garanties de temps d'intervention, détails des prestations..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-contract">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts Appwrite & Services -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+  <script src="js/appwrite.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/contracts.js"></script>
+
+  <!-- Contrôleur dynamique Contrats -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await SessionManager.requireAuth();
+
+      const tableBody = document.getElementById('contracts-table-body');
+      const searchInput = document.getElementById('search-input');
+      const filterStatus = document.getElementById('filter-status');
+      const modal = document.getElementById('modal-contract');
+      const form = document.getElementById('form-contract');
+      const modalTitle = document.getElementById('modal-title');
+
+      let searchTimeout = null;
+
+      // Charger les contrats
+      async function loadContracts() {
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center">Chargement...</td></tr>`;
+
+        try {
+          const response = await ContractService.list({
+            searchQuery: searchInput.value.trim(),
+            statusFilter: filterStatus.value
+          });
+
+          if (!response.documents || response.documents.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center">Aucun contrat trouvé.</td></tr>`;
+            return;
+          }
+
+          tableBody.innerHTML = response.documents.map(contract => {
+            const formattedAmount = contract.amount ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(contract.amount) : 'N/A';
+            const startDate = contract.startDate ? Utils.formatDate(contract.startDate) : 'N/A';
+            const endDate = contract.endDate ? Utils.formatDate(contract.endDate) : 'N/A';
+
+            return `
+              <tr>
+                <td>
+                  <strong>${Utils.escapeHtml(contract.title)}</strong><br>
+                  <small class="text-muted">Client ID: ${Utils.escapeHtml(contract.clientId)}</small>
+                </td>
+                <td>Du ${startDate}<br>au ${endDate}</td>
+                <td><strong>${formattedAmount}</strong></td>
+                <td><span class="badge status-${contract.status}">${Utils.escapeHtml(contract.status)}</span></td>
+                <td>
+                  <button onclick="editContract('${contract.$id}')" class="btn btn-sm btn-outline">Éditer</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+        } catch (error) {
+          console.error("Erreur chargement contrats:", error);
+          tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Erreur lors du chargement des données.</td></tr>`;
+        }
+      }
+
+      // Événements
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(loadContracts, 300);
+      });
+
+      filterStatus.addEventListener('change', loadContracts);
+
+      // Gestion Modal
+      const openModal = () => {
+        form.reset();
+        document.getElementById('contract-id').value = '';
+        modalTitle.textContent = "Nouveau Contrat";
+        modal.classList.add('active');
+      };
+
+      const closeModal = () => modal.classList.remove('active');
+
+      document.getElementById('btn-open-modal').addEventListener('click', openModal);
+      document.getElementById('modal-close').addEventListener('click', closeModal);
+      document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+      // Éditer un contrat
+      window.editContract = async function(contractId) {
+        try {
+          const contract = await ContractService.getById(contractId);
+          document.getElementById('contract-id').value = contract.$id;
+          document.getElementById('contract-title').value = contract.title;
+          document.getElementById('contract-client').value = contract.clientId;
+          document.getElementById('contract-start').value = contract.startDate ? contract.startDate.split('T')[0] : '';
+          document.getElementById('contract-end').value = contract.endDate ? contract.endDate.split('T')[0] : '';
+          document.getElementById('contract-amount').value = contract.amount || 0;
+          document.getElementById('contract-status').value = contract.status || 'active';
+          document.getElementById('contract-desc').value = contract.description || '';
+
+          modalTitle.textContent = "Modifier le Contrat";
+          modal.classList.add('active');
+        } catch (err) {
+          alert("Erreur lors de la récupération du contrat : " + err.message);
+        }
+      };
+
+      // Soumission du formulaire
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('btn-submit-contract');
+        submitBtn.disabled = true;
+
+        const id = document.getElementById('contract-id').value;
+        const contractData = {
+          title: document.getElementById('contract-title').value,
+          clientId: document.getElementById('contract-client').value,
+          startDate: new Date(document.getElementById('contract-start').value).toISOString(),
+          endDate: new Date(document.getElementById('contract-end').value).toISOString(),
+          amount: parseFloat(document.getElementById('contract-amount').value),
+          status: document.getElementById('contract-status').value,
+          description: document.getElementById('contract-desc').value
+        };
+
+        try {
+          if (id) {
+            await ContractService.update(id, contractData);
+          } else {
+            await ContractService.create(contractData);
+          }
+
+          closeModal();
+          await loadContracts();
+        } catch (err) {
+          alert("Erreur d'enregistrement : " + err.message);
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+
+      // Premier chargement
+      loadContracts();
+    });
+  </script>
+document.addEventListener('DOMContentLoaded', () => {
+  const COLLECTION_ID = 'contracts';
+
+  // Éléments du DOM
+  const tableBody = document.getElementById('contracts-table-body') || document.querySelector('tbody');
+  const searchInput = document.getElementById('search-input');
+  const filterStatus = document.getElementById('filter-status');
+  const btnOpenModal = document.getElementById('btn-open-modal');
+
+  // Injection dynamique de la modale de création
+  injectContractModal();
+
+  const modal = document.getElementById('contract-modal');
+  const modalClose = document.getElementById('modal-close');
+  const btnCancel = document.getElementById('btn-cancel-modal');
+  const formContract = document.getElementById('form-contract');
+
+  let searchDebounceTimeout = null;
+
+  // Chargement initial
+  loadContracts();
+
+  // --- Événements ---
+
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchDebounceTimeout);
+      searchDebounceTimeout = setTimeout(loadContracts, 300);
+    });
+  }
+
+  if (filterStatus) {
+    filterStatus.addEventListener('change', loadContracts);
+  }
+
+  if (btnOpenModal) btnOpenModal.addEventListener('click', openModal);
+  if (modalClose) modalClose.addEventListener('click', closeModal);
+  if (btnCancel) btnCancel.addEventListener('click', closeModal);
+
+  if (formContract) {
+    formContract.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleSaveContract();
+    });
+  }
+
+  // --- Fonctions ---
+
+  /**
+   * Charge et filtre la liste des contrats depuis Appwrite.
+   */
+  async function loadContracts() {
+    if (!tableBody) return;
+
+    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Chargement des contrats...</td></tr>';
+
+    try {
+      const queries = [Appwrite.Query.orderDesc('$createdAt')];
+
+      const querySearch = searchInput ? searchInput.value.trim() : '';
+      const queryStatus = filterStatus ? filterStatus.value : '';
+
+      if (querySearch) {
+        queries.push(Appwrite.Query.search('title', querySearch));
+      }
+
+      if (queryStatus) {
+        queries.push(Appwrite.Query.equal('status', queryStatus));
+      }
+
+      const response = await AppwriteConfig.databases.listDocuments(
+        AppwriteConfig.databaseId,
+        COLLECTION_ID,
+        queries
+      );
+
+      renderContracts(response.documents);
+    } catch (error) {
+      console.error('Erreur lors du chargement des contrats :', error);
+      tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Erreur : ${Utils.escapeHtml(error.message)}</td></tr>`;
+    }
+  }
+
+  /**
+   * Rendu HTML des contrats dans le tableau.
+   */
+  function renderContracts(contracts) {
+    if (!contracts || contracts.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucun contrat trouvé.</td></tr>';
+      return;
+    }
+
+    tableBody.innerHTML = contracts.map(item => {
+      const formattedAmount = item.amount 
+        ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(item.amount)
+        : '-';
+
+      return `
+        <tr>
+          <td><strong>${Utils.escapeHtml(item.title || 'Sans nom')}</strong></td>
+          <td>${Utils.escapeHtml(item.client_name || 'Client non associé')}</td>
+          <td>${formattedAmount}</td>
+          <td>
+            <span class="badge status-${Utils.escapeHtml((item.status || 'active').toLowerCase())}">
+              ${Utils.escapeHtml(item.status || 'Actif')}
+            </span>
+          </td>
+          <td>${Utils.formatDate(item.end_date || item.$createdAt)}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /**
+   * Sauvegarde un nouveau contrat dans Appwrite.
+   */
+  async function handleSaveContract() {
+    const btnSubmit = formContract.querySelector('button[type="submit"]');
+    btnSubmit.disabled = true;
+
+    const payload = {
+      title: document.getElementById('contract-title').value.trim(),
+      client_name: document.getElementById('contract-client').value.trim(),
+      amount: parseFloat(document.getElementById('contract-amount').value) || 0,
+      status: document.getElementById('contract-status').value,
+      start_date: document.getElementById('contract-start').value || new Date().toISOString(),
+      end_date: document.getElementById('contract-end').value || null
+    };
+
+    try {
+      await AppwriteConfig.databases.createDocument(
+        AppwriteConfig.databaseId,
+        COLLECTION_ID,
+        Appwrite.ID.unique(),
+        payload
+      );
+
+      closeModal();
+      formContract.reset();
+      await loadContracts();
+    } catch (error) {
+      alert("Erreur lors de la création du contrat : " + error.message);
+    } finally {
+      btnSubmit.disabled = false;
+    }
+  }
+
+  function openModal() {
+    if (modal) modal.classList.add('active');
+  }
+
+  function closeModal() {
+    if (modal) modal.classList.remove('active');
+  }
+
+  /**
+   * Génère la modale de création de contrat dans le DOM.
+   */
+  function injectContractModal() {
+    if (document.getElementById('contract-modal')) return;
+
+    const modalHTML = `
+      <div id="contract-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Nouveau Contrat</h3>
+            <button type="button" id="modal-close" class="modal-close">&times;</button>
+          </div>
+          <form id="form-contract">
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="contract-title">Intitulé du contrat *</label>
+                <input type="text" id="contract-title" class="form-control" required placeholder="Ex: Maintenance Annuelle IT">
+              </div>
+
+              <div class="form-group">
+                <label for="contract-client">Client *</label>
+                <input type="text" id="contract-client" class="form-control" required placeholder="Nom de l'entreprise / client">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="contract-amount">Montant (€)</label>
+                  <input type="number" id="contract-amount" class="form-control" step="0.01" placeholder="1200.00">
+                </div>
+                <div class="form-group col-6">
+                  <label for="contract-status">Statut</label>
+                  <select id="contract-status" class="form-control">
+                    <option value="active" selected>Actif</option>
+                    <option value="pending">En négociation</option>
+                    <option value="expired">Expiré</option>
+                    <option value="closed">Résilié</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="contract-start">Date de début</label>
+                  <input type="date" id="contract-start" class="form-control">
+                </div>
+                <div class="form-group col-6">
+                  <label for="contract-end">Date d'échéance</label>
+                  <input type="date" id="contract-end" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" id="btn-cancel-modal" class="btn btn-secondary">Annuler</button>
+              <button type="submit" class="btn btn-primary">Créer le contrat</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+  }
+});
+</body>
+</html>
