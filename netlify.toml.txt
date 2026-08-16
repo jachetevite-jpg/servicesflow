@@ -1,11 +1,7 @@
-# Configuration des redirections ServicesFlow
-[[redirects]]
-  from = "/"
-  to = "/login.html"
-  status = 200
+[build]
+  publish = "."
 
 [[redirects]]
   from = "/*"
-  to = "/:splat.html"
+  to = "/index.html"
   status = 200
-  force = false

@@ -3,78 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Créer un compte entreprise - ServiceFlow</title>
+  <title>Inscription - ServicesFlow</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/auth.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
 </head>
 <body>
   <div class="auth-container">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="brand-logo" style="justify-content: center;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-          </svg>
-          ServiceFlow
-        </div>
-        <h2>Inscrire votre entreprise</h2>
-        <p>Commencez à gérer vos services en quelques clics</p>
+    <h2>Créer un compte</h2>
+    <p class="text-muted" style="margin-bottom: 1.5rem;">Rejoignez ServicesFlow</p>
+    
+    <form id="register-form">
+      <div class="form-group">
+        <label for="name">Nom complet</label>
+        <input type="text" id="name" class="form-control" required placeholder="Jean Dupont">
       </div>
-
-      <div id="alert-container"></div>
-
-      <form id="register-form">
-        <div class="form-group">
-          <label for="companyName">Nom de l'entreprise</label>
-          <input type="text" id="companyName" class="form-control" placeholder="Ex: TechServices SARL" required>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName">Prénom</label>
-            <input type="text" id="firstName" class="form-control" placeholder="Jean" required>
-          </div>
-          <div class="form-group">
-            <label for="lastName">Nom</label>
-            <input type="text" id="lastName" class="form-control" placeholder="Dupont" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="email">Email professionnel</label>
-            <input type="email" id="email" class="form-control" placeholder="jean@entreprise.com" required>
-          </div>
-          <div class="form-group">
-            <label for="phone">Téléphone</label>
-            <input type="tel" id="phone" class="form-control" placeholder="+33 6 00 00 00 00" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="password">Mot de passe</label>
-          <input type="password" id="password" class="form-control" placeholder="Au moins 8 caractères" minlength="8" required>
-        </div>
-
-        <div class="form-group">
-          <label for="confirmPassword">Confirmer le mot de passe</label>
-          <input type="password" id="confirmPassword" class="form-control" placeholder="Confirmer le mot de passe" required>
-        </div>
-
-        <button type="submit" id="btn-submit" class="btn btn-primary" style="width: 100%;">
-          Créer mon compte
-        </button>
-      </form>
-
-      <div class="auth-footer">
-        Déjà un compte ? <a href="login.html">Se connecter</a>
+      <div class="form-group">
+        <label for="email">Adresse email</label>
+        <input type="email" id="email" class="form-control" required placeholder="nom@exemple.com">
       </div>
-    </div>
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" class="form-control" required placeholder="•••••••• (min. 8 caractères)">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">S'inscrire</button>
+    </form>
+
+    <p style="margin-top: 1rem; text-align: center;" class="text-muted">
+      Déjà inscrit ? <a href="login.html">Se connecter</a>
+    </p>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
   <script src="js/appwrite.js"></script>
-  <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      try {
+        await Auth.register(email, password, name);
+      } catch (err) {
+        alert('Erreur lors de l\'inscription : ' + (err.message || 'Veuillez réessayer.'));
+      }
+    });
+  </script>
 </body>
 </html>
