@@ -17,12 +17,18 @@ const Auth = {
 
     async login(email, password) {
         try {
-            const session = await AppwriteConfig.account.createEmailPasswordSession(email, password);
+            const account = AppwriteConfig.account;
+            if (typeof account.createEmailPasswordSession === 'function') {
+                await account.createEmailPasswordSession(email, password);
+            } else if (typeof account.createEmailSession === 'function') {
+                await account.createEmailSession(email, password);
+            } else {
+                await account.createSession(email, password);
+            }
             window.location.href = 'index.html';
-            return session;
         } catch (error) {
             console.error('Erreur de connexion :', error);
-            throw error;
+            alert('Erreur de connexion : ' + (error.message || 'Identifiants invalides'));
         }
     },
 
@@ -32,7 +38,7 @@ const Auth = {
             await this.login(email, password);
         } catch (error) {
             console.error('Erreur lors de l\'inscription :', error);
-            throw error;
+            alert('Erreur d\'inscription : ' + (error.message || 'Vérifiez les informations'));
         }
     },
 
@@ -41,19 +47,9 @@ const Auth = {
             await AppwriteConfig.account.deleteSession('current');
             window.location.href = 'login.html';
         } catch (error) {
-            console.error('Erreur lors de la déconnexion :', error);
+            console.error('Erreur de déconnexion :', error);
         }
     }
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-    const logoutBtn = document.getElementById('btn-logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            Auth.logout();
-        });
-    }
-});
 
 window.Auth = Auth;

@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inscription - ServicesFlow</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+  <!-- SDK Appwrite v14 -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
 </head>
 <body>
   <div class="auth-container">
     <h2>Créer un compte</h2>
     <p class="text-muted" style="margin-bottom: 1.5rem;">Rejoignez ServicesFlow</p>
     
-    <form id="register-form">
+    <form id="register-form" onsubmit="handleRegister(event)">
       <div class="form-group">
         <label for="name">Nom complet</label>
         <input type="text" id="name" class="form-control" required placeholder="Jean Dupont">
@@ -25,7 +26,7 @@
         <label for="password">Mot de passe</label>
         <input type="password" id="password" class="form-control" required placeholder="•••••••• (min. 8 caractères)">
       </div>
-      <button type="submit" class="btn btn-primary btn-block">S'inscrire</button>
+      <button type="submit" id="btn-submit" class="btn btn-primary btn-block">S'inscrire</button>
     </form>
 
     <p style="margin-top: 1rem; text-align: center;" class="text-muted">
@@ -36,18 +37,23 @@
   <script src="js/appwrite.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
+    async function handleRegister(e) {
       e.preventDefault();
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.textContent = "Inscription en cours...";
+
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      
+
       try {
         await Auth.register(email, password, name);
       } catch (err) {
-        alert('Erreur lors de l\'inscription : ' + (err.message || 'Veuillez réessayer.'));
+        btn.disabled = false;
+        btn.textContent = "S'inscrire";
       }
-    });
+    }
   </script>
 </body>
 </html>
